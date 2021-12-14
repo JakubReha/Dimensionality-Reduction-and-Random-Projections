@@ -3,6 +3,7 @@ https://arxiv.org/abs/1903.07902
 
 ## Task list
 - [ ] Implement Data Loader (loading the dataset + train/test split)
+- [ ] Implement Random Walk Context Graph
 - [ ] Implement 5 unsupervised algorithms
 - [ ] Implement Link Prediction framework
 - [ ] Implement Multilabel Node Classification framework
