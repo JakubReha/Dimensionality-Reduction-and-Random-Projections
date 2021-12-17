@@ -1,6 +1,7 @@
 from PIL import Image
 import random
 import os
+import numpy as np
 
 data_images = []
 for filename in os.listdir("data/images"):
@@ -22,3 +23,9 @@ for image in data_images:
 
 to_remove = set(random.sample(range(len(samples)), 300))
 samples = [x for i, x in enumerate(samples) if not i in to_remove]
+
+flat_arrays = []
+for image in samples:
+    image_arr = np.array(image)
+    flat_arr = image_arr.reshape(-1)
+    flat_arrays.append(flat_arr)
