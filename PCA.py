@@ -1,6 +1,7 @@
 import numpy as np
+from DimRed import DimRed
 
-class PCA:
+class PCA(DimRed):
 
     def __init__(self, X, components):
 
@@ -27,6 +28,6 @@ class PCA:
         eig_val, eig_vect = self.eigen()
         eig_vect_subset = eig_vect[:, 0: self.components]
 
-        X_emb = np.dot(eig_vect_subset.transpose(), self.X_mean.transpose()).transpose()
+        self.X_k = np.dot(eig_vect_subset.transpose(), self.X_mean.transpose()).transpose()
 
-        return X_emb
+        return self.X_k
