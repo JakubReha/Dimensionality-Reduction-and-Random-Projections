@@ -43,7 +43,10 @@ class DCT(DimRed):
             raise Exception("specify the the type of fft")
 
         for i, f in enumerate(dct):
-            dct[i] *= np.exp(-1j * np.pi * i / (2 * N))
+            if i == 0:
+                dct[i] *= 1/(2*np.sqrt(N))*np.exp(-1j * np.pi * i / (2 * N))
+            else:
+                dct[i] *= 1/(np.sqrt(2*N))*np.exp(-1j * np.pi * i / (2 * N))
             i += 1
 
         return dct.real
