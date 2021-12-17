@@ -1,17 +1,18 @@
 import numpy as np
 from DimRed import DimRed
+from sklearn.decomposition import TruncatedSVD
 
 class PCA(DimRed):
 
     def __init__(self, X, components):
-
+        self.N = X.shape[1]
         self.X = X
         self.X_mean = self.X - np.mean(self.X, axis=0)
         self.components = components
 
     def eigen(self):
 
-        cov = np.cov(self.X_mean, rowvar=False)
+        cov = np.cov(self.X_mean, rowvar=True)
         # each column represents a variable, with observations in the rows.
 
         eig_val, eig_vect = np.linalg.eigh(cov)
@@ -25,9 +26,12 @@ class PCA(DimRed):
         return eig_val, eig_vect
 
     def fit(self):
-        eig_val, eig_vect = self.eigen()
-        eig_vect_subset = eig_vect[:, 0: self.components]
+        #eig_val, eig_vect = self.eigen()
+        svd = TruncatedSVD(n_components=self.components)
+        self.X_k = svd.fit_transform(self.X.T, y=None).T
+        print("hi")
+        #eig_vect_subset = eig_vect[:, 0: self.components]
 
-        self.X_k = np.dot(eig_vect_subset.transpose(), self.X_mean.transpose()).transpose()
+        #self.X_k = np.dot(eig_vect_subset.transpose(), self.X_mean.transpose()).transpose()
 
         return self.X_k

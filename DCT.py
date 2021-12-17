@@ -1,14 +1,16 @@
 import numpy as np
 from DimRed import DimRed
+from tqdm import tqdm
 
 class DCT(DimRed):
     def __init__(self, X, k):
         self.X = X
+        self.N = X.shape[1]
         self.d = np.shape(X)[0]
         self.k = k
         self.closest_power = 1
-        while self.closest_power < self.d:
-            self.closest_power *= 2
+        """while self.closest_power < self.d:
+            self.closest_power *= 2"""
 
 
     def fft(self, samples):
@@ -23,7 +25,7 @@ class DCT(DimRed):
             X = np.concatenate([even_samples + multiplicative_term[:int(N / 2)] * odd_samples,even_samples + multiplicative_term[int(N / 2):] * odd_samples])
             return X
 
-    def dct(self, samples, type):
+    def dctf(self, samples, type):
         dct = []
         N = self.d
         if type == "numpy":
@@ -42,17 +44,14 @@ class DCT(DimRed):
         else:
             raise Exception("specify the the type of fft")
 
-        for i, f in enumerate(dct):
-            if i == 0:
-                dct[i] *= 1/(2*np.sqrt(N))*np.exp(-1j * np.pi * i / (2 * N))
-            else:
-                dct[i] *= 1/(np.sqrt(2*N))*np.exp(-1j * np.pi * i / (2 * N))
-            i += 1
+        dct[0] = dct[0] * 1/(2*np.sqrt(N))
+        i = np.arange(1, len(dct))
+        dct[1:] = dct[1:] * 1/(np.sqrt(2*N))*np.exp(-1j * np.pi * i / (2 * N))
 
         return dct.real
 
     def fit(self, type="numpy"):
         self.X_k = np.empty_like(self.X, dtype=float)
-        for i in range(len(self.X.T)):
-            self.X_k[:, i] = self.dct(self.X[:, i], type)
+        for i in tqdm(range(len(self.X.T))):
+            self.X_k[:, i] = self.dctf(self.X[:, i], type)
         return self.X_k[:self.k]

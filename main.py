@@ -4,8 +4,11 @@ import string
 from stopwords import get_stopwords
 import re
 from srp import SRP
+from pca import PCA
+from DCT import DCT
 import matplotlib.pyplot as plt
 import numpy as np
+from tqdm import tqdm
 from sklearn.preprocessing import normalize
 
 stop_words = get_stopwords('en')
@@ -48,9 +51,15 @@ if __name__ == "__main__":
     y = []
     X = ft(corpus)
     dim = X.shape[0]
-    for k in range(100, 1000, 20):
-        srp = SRP(dim, k)
+    for k in tqdm(range(100, 1000, 20)):
+        """srp = SRP(dim, k)
         srp.project(X)
+        y.append(np.mean(srp.distortions_inner_product(90)))
+        srp = PCA(X, k)
+        srp.fit()
+        y.append(np.mean(srp.distortions_inner_product(90)))"""
+        srp = PCA(X, k)
+        srp.fit()
         y.append(np.mean(srp.distortions_inner_product(90)))
 
     x = np.arange(100, 1000, 20)
