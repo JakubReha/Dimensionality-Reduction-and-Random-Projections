@@ -54,5 +54,5 @@ class DCT(DimRed):
     def fit(self, type="numpy"):
         self.X_k = np.empty_like(self.X, dtype=float)
         for i in range(len(self.X.T)):
-            self.X_k[:, i] = self.dct(self.X_k[:, i], type)
+            self.X_k[:, i] = self.dct(self.X[:, i], type)
         return self.X_k[:self.k]
