@@ -1,7 +1,8 @@
 import numpy as np
+from DimRed import DimRed
 
-class DCT:
-    def __init__(self,X,k):
+class DCT(DimRed):
+    def __init__(self, X, k):
         self.X = X
         self.d = np.shape(X)[0]
         self.k = k
@@ -10,7 +11,7 @@ class DCT:
             self.closest_power *= 2
 
 
-    def fft(self,samples):
+    def fft(self, samples):
         N = len(samples)
         if N == 1:
             return samples
@@ -22,7 +23,7 @@ class DCT:
             X = np.concatenate([even_samples + multiplicative_term[:int(N / 2)] * odd_samples,even_samples + multiplicative_term[int(N / 2):] * odd_samples])
             return X
 
-    def dct(self,samples,type):
+    def dct(self, samples, type):
         dct = []
         N = self.d
         if type == "numpy":
@@ -41,14 +42,14 @@ class DCT:
         else:
             raise Exception("specify the the type of fft")
 
-        for i,f in enumerate(dct):
+        for i, f in enumerate(dct):
             dct[i] *= np.exp(-1j * np.pi * i / (2 * N))
             i += 1
 
         return dct.real
 
-    def fit(self,type="numpy"):
-        self.Y = np.empty_like(self.X, dtype=float)
+    def fit(self, type="numpy"):
+        self.X_k = np.empty_like(self.X, dtype=float)
         for i in range(len(self.X.T)):
-            self.Y[:,i] = self.dct(self.X[:,i],type)
-        return self.Y[:self.k]
+            self.X_k[:, i] = self.dct(self.X_k[:, i], type)
+        return self.X_k[:self.k]

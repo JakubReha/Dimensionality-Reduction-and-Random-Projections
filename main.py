@@ -6,6 +6,7 @@ import re
 from srp import SRP
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.preprocessing import normalize
 
 stop_words = get_stopwords('en')
 
@@ -28,6 +29,12 @@ def preprocess(text):
     text = " ".join([w for w in text.split() if w not in stop_words])
     return text
 
+def ft(corpus):
+    vectorizer = CountVectorizer()
+    X = vectorizer.fit_transform(corpus).T
+    X = X[:, np.array(X.sum(axis=0) > 0).squeeze()]
+    X = np.array(X / np.sum(X, axis=0))
+    return X
 
 if __name__ == "__main__":
     docs = glob.glob('data/text/**/*')
@@ -38,14 +45,13 @@ if __name__ == "__main__":
                 corpus.append(preprocess(" ".join([l.rstrip() for l in f])))
         except:
             pass
-    vectorizer = CountVectorizer()
-    X = vectorizer.fit_transform(corpus).T
-    # TODO: convert to normalize frequencies
     y = []
+    X = ft(corpus)
+    dim = X.shape[0]
     for k in range(100, 1000, 20):
-        srp = SRP(X.shape[0], k)
+        srp = SRP(dim, k)
         srp.project(X)
-        y.append(np.mean(srp.distortions(100)))
+        y.append(np.mean(srp.distortions_inner_product(90)))
 
     x = np.arange(100, 1000, 20)
     plt.scatter(x, y)
