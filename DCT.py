@@ -8,6 +8,7 @@ class DCT(DimRed):
         self.N = X.shape[1]
         self.d = np.shape(X)[0]
         self.k = k
+        self.scale = 1
         self.closest_power = 1
         """while self.closest_power < self.d:
             self.closest_power *= 2"""

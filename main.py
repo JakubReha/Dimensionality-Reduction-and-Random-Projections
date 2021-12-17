@@ -58,7 +58,7 @@ if __name__ == "__main__":
         srp = PCA(X, k)
         srp.fit()
         y.append(np.mean(srp.distortions_inner_product(90)))"""
-        srp = PCA(X, k)
+        srp = DCT(X, k)
         srp.fit()
         y.append(np.mean(srp.distortions_inner_product(90)))
 

@@ -7,6 +7,7 @@ class RP(DimRed):
         self.d = d
         self.k = k
         self.N = N
+        self.scale = np.sqrt(self.d / self.k)
         s = np.sqrt(N)
         R = np.sqrt(s) * np.random.choice([1, 0, -1], size = d*k, p=[1/(2*s), 1 - 1/s, 1/(2*s)])
         self.R = R.reshape((k, d))

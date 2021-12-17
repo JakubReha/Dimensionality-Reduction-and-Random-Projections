@@ -9,6 +9,7 @@ class SRP(DimRed):
         """
         self.k = k
         self.d = d
+        self.scale = np.sqrt(self.d / self.k)
         R = np.sqrt(3) * np.random.choice([1, 0, -1], size=self.k * self.d, p=[1 / 6, 2 / 3, 1 / 6])
         self.R = R.reshape((self.k, self.d))
 
