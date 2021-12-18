@@ -7,6 +7,7 @@ class PCA(DimRed):
     def __init__(self, X, components):
         self.N = X.shape[1]
         self.X = X
+        self.scale = 1
         self.X_mean = self.X - np.mean(self.X, axis=0)
         self.components = components
 
@@ -29,7 +30,6 @@ class PCA(DimRed):
         #eig_val, eig_vect = self.eigen()
         svd = TruncatedSVD(n_components=self.components)
         self.X_k = svd.fit_transform(self.X.T, y=None).T
-        print("hi")
         #eig_vect_subset = eig_vect[:, 0: self.components]
 
         #self.X_k = np.dot(eig_vect_subset.transpose(), self.X_mean.transpose()).transpose()

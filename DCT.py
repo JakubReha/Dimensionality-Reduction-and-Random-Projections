@@ -6,7 +6,7 @@ class DCT(DimRed):
     def __init__(self, X, k):
         self.X = X
         self.N = X.shape[1]
-        self.d = np.shape(X)[0]
+        self.d = X.shape[0]
         self.k = k
         self.scale = 1
         self.closest_power = 1
