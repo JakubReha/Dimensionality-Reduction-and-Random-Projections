@@ -1,5 +1,6 @@
 import numpy as np
 from DimRed import DimRed
+from sklearn.random_projection import SparseRandomProjection as SRP2
 
 class SRP(DimRed):
     def __init__(self, X, k):
@@ -21,6 +22,8 @@ class SRP(DimRed):
         :return: reduced data matrix
         """
         self.X_k = self.R @ self.X
+        transformer = SRP2(n_components=self.k)
+        self.X_k = transformer.fit_transform(self.X.T).T
         return self.X_k
 
 

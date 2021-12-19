@@ -74,13 +74,13 @@ if __name__ == "__main__":
     for i, k in enumerate(tqdm(range(start, stop, step))):
         """srp = SRP(X, k)
         srp.fit()
-        y_srp[k] = srp.distortions_inner_product(pairs)"""
+        y_srp[i] = srp.distortions_inner_product(pairs)"""
         pca = PCA(X, k)
         pca.fit()
         y_pca[i] = pca.distortions_inner_product(pairs)
         """dct = DCT(X, k)
         dct.fit()
-        y_dct[k] = dct.distortions_inner_product(pairs)"""
+        y_dct[i] = dct.distortions_inner_product(pairs)"""
         rp = RP(X, k)
         rp.fit()
         y_rp[i] = rp.distortions_inner_product(pairs)
@@ -89,10 +89,13 @@ if __name__ == "__main__":
     x = np.arange(100, 1000, 20)
     ci_rp = 1.96 * np.std(y_rp, axis=1) / np.sqrt(pairs)
     ci_pca = 1.96 * np.std(y_pca, axis=1) / np.sqrt(pairs)
+    #ci_srp = 1.96 * np.std(y_srp, axis=1) / np.sqrt(pairs)
     plt.scatter(x, np.mean(y_rp, axis=1), marker="+")
     plt.scatter(x, np.mean(y_pca, axis=1), marker="d")
+    #plt.scatter(x, np.mean(y_srp, axis=1), marker="o")
     plt.fill_between(x, (np.mean(y_rp, axis=1) - ci_rp), (np.mean(y_rp, axis=1) + ci_rp), color='blue', alpha=0.1)
     plt.fill_between(x, (np.mean(y_pca, axis=1) - ci_pca), (np.mean(y_pca, axis=1) + ci_pca), color='orange', alpha=0.1)
+    #plt.fill_between(x, (np.mean(y_srp, axis=1) - ci_srp), (np.mean(y_srp, axis=1) + ci_srp), color='red', alpha=0.1)
     plt.legend(["RP", "SVD"])
     plt.title("Average error using RP and SVD")
     plt.xlabel("Reduced dim. of data")
