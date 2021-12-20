@@ -52,7 +52,8 @@ class DCT(DimRed):
         return dct.real
 
     def fit(self, type="numpy"):
-        self.X_k = np.empty_like(self.X, dtype=float)
+        y = np.empty_like(self.X, dtype=float)
         for i in tqdm(range(len(self.X.T))):
-            self.X_k[:, i] = self.dctf(self.X[:, i], type)
-        return self.X_k[:self.k]
+            y[:, i] = self.dctf(self.X[:, i], type)
+        self.X_k = y[:self.k]
+        return self.X_k

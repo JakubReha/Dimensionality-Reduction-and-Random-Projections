@@ -4,7 +4,7 @@ import string
 from PIL import Image
 import re
 from srp import SRP
-from pca import PCA
+from PCA import PCA
 from DCT import DCT
 from rp import RP
 import matplotlib.pyplot as plt
