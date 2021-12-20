@@ -33,19 +33,15 @@ flat_arrays = []
 saltpep_arrays = []
 for image in samples:
     image_arr = np.array(image)
-    flat_arr = image_arr.reshape(-1)
-    flat_arrays.append(flat_arr)
-
-    for pixel in flat_arr:
+    flat_arr = image_arr.flatten()
+    for i in range(len(flat_arr)):
         proba = random.randrange(1,100)
         if proba <= 20:
             flip = random.randint(0, 1)
             if flip == 0:
-                flat_arr[pixel] = 0
+                flat_arr[i] = 0
             else:
-                flat_arr[pixel] = 255
-    saltpep_arrays.append(flat_arr)
-
+                flat_arr[i] = 255
 
 normal_im = Image.fromarray(flat_arrays[3].reshape(50,50))
 normal_im.show()
