@@ -1,5 +1,4 @@
 from PIL import Image
-from PIL import Image
 import random
 import os
 import numpy as np
@@ -26,9 +25,9 @@ for image in data_images:
 
 to_remove = set(random.sample(range(len(samples)), 300))
 # 1000 samples
-samples = [x for i, x in enumerate(samples) if not i in to_remove]
+samples = [x for i, x in enumerate(samples) if i not in to_remove]
 
-for i,sample in enumerate(samples):
+for i, sample in enumerate(samples):
     sample.save("data/img/"+str(i)+".tiff")
 
 # samples[0].show()
@@ -42,7 +41,7 @@ for image in samples:
     image_arr = np.array(image)
     flat_arr = image_arr.flatten()
     for i in range(len(flat_arr)):
-        proba = random.randrange(1,100)
+        proba = random.randrange(1, 100)
         if proba <= 20:
             flip = random.randint(0, 1)
             if flip == 0:
@@ -51,7 +50,7 @@ for image in samples:
                 flat_arr[i] = 255
     noisy_images.append(Image.fromarray(flat_arr.reshape(50,50)))
 
-for i,sample in enumerate(noisy_images):
+for i, sample in enumerate(noisy_images):
     sample.save("data/noisy_img/"+str(i)+".tiff")
 
 normal_im = Image.fromarray(flat_arr.reshape(50,50))
