@@ -28,7 +28,7 @@ samples = [x for i, x in enumerate(samples) if not i in to_remove]
 samples[0].show()
 
 # 1 d arrays
-flat_arrays = []
+flat_arr = []
 # salt and pepper added
 saltpep_arrays = []
 for image in samples:
@@ -43,5 +43,6 @@ for image in samples:
             else:
                 flat_arr[i] = 255
 
-normal_im = Image.fromarray(flat_arrays[3].reshape(50,50))
+
+normal_im = Image.fromarray(flat_arr.reshape(50,50))
 normal_im.show()
