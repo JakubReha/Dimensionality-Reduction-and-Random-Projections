@@ -108,7 +108,7 @@ def test_image():
         im = Image.open(img)
         image_arr = np.array(im)
         #TODO: normalize or not?
-        flat_arr = image_arr.flatten()/255
+        flat_arr = image_arr.flatten()
         data_images.append(flat_arr)
     X = np.array(data_images).T
     pairs = 100
