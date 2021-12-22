@@ -11,8 +11,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 import stopwords
+import time
+import sys
 import seaborn as sns
 stop_words = stopwords.stopwords
+# from python_papi import events, papi_high as high
+
 
 
 def preprocess(text):
@@ -119,25 +123,38 @@ def test_image():
     y_pca = np.zeros((int((stop - start) / step), pairs))
     y_srp = np.zeros((int((stop - start) / step), pairs))
     y_rp = np.zeros((int((stop - start) / step), pairs))
+    flops = np.zeros((4,40))
+
     for i, k in enumerate(tqdm(range(start, stop, step))):
+        starttime = time.time()
         srp = SRP(X, k)
         srp.fit()
+        flops[0,i] = time.time() - starttime
         y_srp[i] = srp.distortions_euclidean(pairs)
+        starttime = time.time()
         pca = PCA(X, k)
         pca.fit()
+        flops[1,i] = time.time() - starttime
         y_pca[i] = pca.distortions_euclidean(pairs)
+        starttime = time.time()
         dct = DCT(X, k)
         dct.fit()
+        flops[2,i] = time.time() - starttime
         y_dct[i] = dct.distortions_euclidean(pairs)
+
+        starttime = time.time()
         rp = RP(X, k)
         rp.fit()
+        flops[3,i] = time.time() - starttime
         y_rp[i] = rp.distortions_euclidean(pairs)
+
 
     x = np.arange(start, stop, step)
     ci_rp = 1.96 * np.std(y_rp, axis=1) / np.sqrt(pairs)
     ci_pca = 1.96 * np.std(y_pca, axis=1) / np.sqrt(pairs)
     ci_srp = 1.96 * np.std(y_srp, axis=1) / np.sqrt(pairs)
     ci_dct = 1.96 * np.std(y_dct, axis=1) / np.sqrt(pairs)
+
 
     plt.scatter(x, np.mean(y_rp, axis=1), marker="+")
     plt.scatter(x, np.mean(y_pca, axis=1), marker="d")
@@ -150,12 +167,21 @@ def test_image():
     plt.fill_between(x, (np.mean(y_dct, axis=1) - ci_dct), (np.mean(y_dct, axis=1) + ci_dct), color='yellow', alpha=0.1)
 
     plt.legend(["RP", "PCA", "SRP", "DCT"])
-    #plt.legend(["RP", "PCA", "DCT"])
+    # plt.legend(["PCA", "DCT"])
     plt.title("Average error using PCA, RP, SVD and DCT")
     plt.xlabel("Reduced dim. of data")
     plt.ylabel("Error difference")
     plt.show()
 
+    plt.scatter(x, flops[0, :], marker="o")
+    plt.scatter(x, flops[1, :], marker="d")
+    plt.scatter(x, flops[2, :], marker=".")
+    plt.scatter(x, flops[3, :], marker="+")
+    plt.legend(["SRP", "PCA", "DCT", "RP"])
+    plt.title("Running time using PCA, RP, SVD and DCT")
+    plt.xlabel("Reduced dim. of data")
+    plt.ylabel("running time (seconds)")
+    plt.show()
 
 if __name__ == "__main__":
     test_image()
