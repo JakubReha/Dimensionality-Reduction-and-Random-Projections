@@ -3,13 +3,16 @@ from DimRed import DimRed
 from tqdm import tqdm
 
 class DCT(DimRed):
-    def __init__(self, X, k):
+    def __init__(self, X):
         self.X = X
         self.N = X.shape[1]
         self.d = X.shape[0]
-        self.k = k
         self.scale = 1
         self.closest_power = 1
+        type = "numpy"
+        self.y = np.empty_like(self.X, dtype=float)
+        for i in range(len(self.X.T)):
+            self.y[:, i] = self.dctf(self.X[:, i], type)
         """while self.closest_power < self.d:
             self.closest_power *= 2"""
 
@@ -51,10 +54,8 @@ class DCT(DimRed):
 
         return dct.real
 
-    def fit(self, type="numpy"):
-        y = np.empty_like(self.X, dtype=float)
-        for i in tqdm(range(len(self.X.T))):
-            y[:, i] = self.dctf(self.X[:, i], type)
-        self.X_k = y[:self.k]
+    def fit(self, k):
+        self.k = k
+        self.X_k = self.y[:self.k]
         return self.X_k
 
