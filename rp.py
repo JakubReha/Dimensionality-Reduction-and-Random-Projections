@@ -11,9 +11,10 @@ class RP(DimRed):
         self.k = k
         self.N = X.shape[1]
         self.d = X.shape[0]
-        self.scale = 1 #np.sqrt(self.d / self.k)
+        self.scale = np.sqrt(self.d / self.k)
         self.X = X
-        self.R = np.random.normal(loc=0.0, scale=1.0/np.sqrt(self.k), size=((self.k, self.d)))
+        self.R = np.random.normal(loc=0.0, scale=1, size=((self.d, self.k)))
+        self.R = (self.R / np.sqrt((self.R**2).sum(axis=0))).T
 
     def fit(self):
         """
@@ -21,8 +22,6 @@ class RP(DimRed):
         :return: reduced data matrix
         """
         self.X_k = self.R @ self.X
-        #transformer = GRP(n_components=self.k)
-        #self.X_k = transformer.fit_transform(self.X.T).T
         return self.X_k
 
 

@@ -11,9 +11,10 @@ class SRP(DimRed):
         self.N = X.shape[1]
         self.d = X.shape[0]
         self.X = X
-        self.scale = 1 / np.sqrt(self.k) #np.sqrt(self.d / self.k)
+        self.scale = np.sqrt(self.d / self.k)
         R = np.sqrt(3) * np.random.choice([1, 0, -1], size=self.k * self.d, p=[1 / 6, 2 / 3, 1 / 6])
-        self.R = R.reshape((self.k, self.d))
+        self.R = R.reshape((self.d, self.k))
+        self.R = (self.R / np.sqrt((self.R ** 2).sum(axis=0))).T
 
     def fit(self):
         """
@@ -21,8 +22,6 @@ class SRP(DimRed):
         :return: reduced data matrix
         """
         self.X_k = self.R @ self.X
-        #transformer = SRP2(n_components=self.k)
-        #self.X_k = transformer.fit_transform(self.X.T).T
         return self.X_k
 
 

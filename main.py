@@ -3,8 +3,9 @@ import glob
 import string
 from PIL import Image
 import re
+import pandas as pd
 from srp import SRP
-from pca import PCA
+from PCA import PCA
 from DCT import DCT
 from rp import RP
 import matplotlib.pyplot as plt
@@ -18,10 +19,11 @@ stop_words = stopwords.stopwords
 np.random.seed(2)
 
 
-def preprocess(text):
+def preprocess(text, header=False):
     # remove header
-    out = text.find('Lines:')
-    text = text[out + 8:]
+    if header:
+        out = text.find('Lines:')
+        text = text[out + 8:]
     while len(text) > 0 and (text[0] in string.digits or text[0] == " "):
         if len(text) == 0:
             break
@@ -61,7 +63,7 @@ def test_text():
     for doc in docs:
         try:
             with open(doc) as f:
-                corpus.append(preprocess(" ".join([l.rstrip() for l in f])))
+                corpus.append(preprocess(" ".join([l.rstrip() for l in f]), True))
         except:
             pass
     pairs = 100
@@ -113,11 +115,10 @@ def test_image(type="img"):
     imgs = glob.glob('data/{}/*.tiff'.format(type))
     for img in imgs:
         im = Image.open(img)
-        image_arr = np.array(im)
-        #TODO: normalize or not?
-        flat_arr = image_arr.flatten()/255
+        image_arr = np.array(im)/255
+        flat_arr = image_arr.flatten()
         data_images.append(flat_arr)
-        mf_images.append(median_filter(image_arr/255, (3, 3)).flatten())
+        mf_images.append(median_filter(image_arr, (3, 3)).flatten())
     X = np.array(data_images).T
     pairs = 100
     start = 1
@@ -192,13 +193,15 @@ def test_audio():
     X = X/(2**16-1)
     pairs = 100
     start = 1
-    stop = 40001
+    stop = 20001
     step = 1000
     y_dct = np.zeros((int((stop - start) / step), pairs))
     dct = DCT(X)
     start2 = 1
-    stop2 = 2601
-    step2 = 200
+    #stop2 = 2601
+    #step2 = 200
+    stop2 = 1001
+    step2 = 50
     pca = PCA(X, stop2)
     y_pca = np.zeros((int((stop2 - start2) / step2), pairs))
     y_srp = np.zeros((int((stop2 - start2) / step2), pairs))
@@ -212,20 +215,20 @@ def test_audio():
         rp = RP(X, k)
         rp.fit()
         y_rp[i] = rp.distortions_euclidean(pairs)
-    for i, k in enumerate(tqdm(range(start, stop, step))):
+    #for i, k in enumerate(tqdm(range(start, stop, step))):
         dct.fit(k)
         y_dct[i] = dct.distortions_euclidean(pairs)
 
-    x_dct = np.arange(start, stop, step)
+    #x_dct = np.arange(start, stop, step)
     x = np.arange(start2, stop2, step2)
-    x_add = np.arange(stop2, stop, step)
-    y_add = np.ones_like(x_add)
+    #x_add = np.arange(stop2, stop, step)
+    #y_add = np.ones_like(x_add)
     ci_rp = 1.96 * np.std(y_rp, axis=1) / np.sqrt(pairs)
     ci_pca = 1.96 * np.std(y_pca, axis=1) / np.sqrt(pairs)
     ci_srp = 1.96 * np.std(y_srp, axis=1) / np.sqrt(pairs)
     ci_dct = 1.96 * np.std(y_dct, axis=1) / np.sqrt(pairs)
 
-    plt.scatter(np.concatenate((x, x_add)), np.concatenate((np.mean(y_rp, axis=1), y_add * np.mean(y_rp, axis=1)[-1])), marker="+", color="blue", alpha=0.7)
+    """plt.scatter(np.concatenate((x, x_add)), np.concatenate((np.mean(y_rp, axis=1), y_add * np.mean(y_rp, axis=1)[-1])), marker="+", color="blue", alpha=0.7)
     plt.scatter(np.concatenate((x, x_add)), np.concatenate((np.mean(y_pca, axis=1), y_add * np.mean(y_pca, axis=1)[-1])), marker="d", color="orange", alpha=0.7)
     plt.scatter(np.concatenate((x, x_add)), np.concatenate((np.mean(y_srp, axis=1), y_add * np.mean(y_srp, axis=1)[-1])), marker="o", color="red", alpha=0.7)
     plt.scatter(x_dct, np.mean(y_dct, axis=1), marker=".", color="green", alpha=0.7)
@@ -233,7 +236,17 @@ def test_audio():
     plt.fill_between(np.concatenate((x, x_add)), np.concatenate(((np.mean(y_rp, axis=1) - ci_rp), y_add*(np.mean(y_rp, axis=1) - ci_rp)[-1])), np.concatenate(((np.mean(y_rp, axis=1) + ci_rp), y_add*(np.mean(y_rp, axis=1) + ci_rp)[-1])), color='blue', alpha=0.1)
     plt.fill_between(np.concatenate((x, x_add)), np.concatenate(((np.mean(y_pca, axis=1) - ci_pca), y_add*(np.mean(y_pca, axis=1) - ci_pca)[-1])), np.concatenate(((np.mean(y_pca, axis=1) + ci_pca), y_add*(np.mean(y_pca, axis=1) + ci_pca)[-1])), color='orange', alpha=0.1)
     plt.fill_between(np.concatenate((x, x_add)), np.concatenate(((np.mean(y_srp, axis=1) - ci_srp), y_add*(np.mean(y_srp, axis=1) - ci_srp)[-1])), np.concatenate(((np.mean(y_srp, axis=1) + ci_srp), y_add*(np.mean(y_srp, axis=1) + ci_srp)[-1])), color='red', alpha=0.1)
-    plt.fill_between(x_dct, (np.mean(y_dct, axis=1) - ci_dct), (np.mean(y_dct, axis=1) + ci_dct), color='green', alpha=0.1)
+    plt.fill_between(x_dct, (np.mean(y_dct, axis=1) - ci_dct), (np.mean(y_dct, axis=1) + ci_dct), color='green', alpha=0.1)"""
+
+    plt.scatter(x, np.mean(y_rp, axis=1), marker="+", color="blue")
+    plt.scatter(x, np.mean(y_pca, axis=1), marker="d", color="orange")
+    plt.scatter(x, np.mean(y_srp, axis=1), marker="o", color="red")
+    plt.scatter(x, np.mean(y_dct, axis=1), marker=".", color="green")
+
+    plt.fill_between(x, (np.mean(y_rp, axis=1) - ci_rp), (np.mean(y_rp, axis=1) + ci_rp), color='blue', alpha=0.1)
+    plt.fill_between(x, (np.mean(y_pca, axis=1) - ci_pca), (np.mean(y_pca, axis=1) + ci_pca), color='orange', alpha=0.1)
+    plt.fill_between(x, (np.mean(y_srp, axis=1) - ci_srp), (np.mean(y_srp, axis=1) + ci_srp), color='red', alpha=0.1)
+    plt.fill_between(x, (np.mean(y_dct, axis=1) - ci_dct), (np.mean(y_dct, axis=1) + ci_dct), color='green', alpha=0.1)
 
     plt.legend(["RP", "PCA", "SRP", "DCT"])
     plt.title("Average error using PCA, RP, SVD and DCT")
@@ -242,8 +255,63 @@ def test_audio():
     plt.show()
 
 
+def text2():
+    docs = glob.glob('data/text2/**/*')
+    corpus = []
+    for doc in docs:
+        try:
+            with open(doc) as f:
+                corpus.append(preprocess(" ".join([l.rstrip() for l in f])))
+        except:
+            pass
+
+    pairs = 100
+    X = ft(corpus)
+    dim = X.shape[0]
+    start = 1
+    stop = 801
+    step = 40
+    y_dct = np.zeros((int((stop - start) / step), pairs))
+    y_pca = np.zeros((int((stop - start) / step), pairs))
+    y_srp = np.zeros((int((stop - start) / step), pairs))
+    y_rp = np.zeros((int((stop - start) / step), pairs))
+    # dct = DCT(X)
+    pca = PCA(X, stop)
+    for i, k in enumerate(tqdm(range(start, stop, step))):
+        """srp = SRP(X, k)
+        srp.fit()
+        y_srp[i] = srp.distortions_inner_product(pairs)"""
+        pca.fit(k)
+        y_pca[i] = pca.distortions_inner_product(pairs)
+        """dct.fit(k)
+        y_dct[i] = dct.distortions_inner_product(pairs)"""
+        rp = RP(X, k)
+        rp.fit()
+        y_rp[i] = rp.distortions_inner_product(pairs)
+
+    x = np.arange(start, stop, step)
+    ci_rp = 1.96 * np.std(y_rp, axis=1) / np.sqrt(pairs)
+    ci_pca = 1.96 * np.std(y_pca, axis=1) / np.sqrt(pairs)
+    # ci_dct = 1.96 * np.std(y_dct, axis=1) / np.sqrt(pairs)
+    # ci_srp = 1.96 * np.std(y_srp, axis=1) / np.sqrt(pairs)
+    # plt.scatter(x, np.mean(y_dct, axis=1), marker="d")
+    plt.scatter(x, np.mean(y_rp, axis=1), marker="+")
+    plt.scatter(x, np.mean(y_pca, axis=1), marker="d")
+    # plt.scatter(x, np.mean(y_srp, axis=1), marker="o")
+    # plt.fill_between(x, (np.mean(y_dct, axis=1) - ci_dct), (np.mean(y_dct, axis=1) + ci_dct), color='blue', alpha=0.1)
+    plt.fill_between(x, (np.mean(y_rp, axis=1) - ci_rp), (np.mean(y_rp, axis=1) + ci_rp), color='blue', alpha=0.1)
+    plt.fill_between(x, (np.mean(y_pca, axis=1) - ci_pca), (np.mean(y_pca, axis=1) + ci_pca), color='orange', alpha=0.1)
+    # plt.fill_between(x, (np.mean(y_srp, axis=1) - ci_srp), (np.mean(y_srp, axis=1) + ci_srp), color='red', alpha=0.1)
+    plt.legend(["RP", "PCA"])
+    plt.title("Average error using RP and SVD")
+    plt.xlabel("Reduced dim. of data")
+    plt.ylabel("Error difference")
+    plt.show()
+
+
 if __name__ == "__main__":
-    #test_image("img")
-    test_audio()
-    #test_image("img")
+    #text2()
+    test_image("img")
+    #test_audio()
+    #test_image("noisy_img")
     #test_text()
