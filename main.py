@@ -84,8 +84,8 @@ def test_text():
         y_srp[i] = srp.distortions_inner_product(pairs)"""
         pca.fit(k)
         y_pca[i] = pca.distortions_inner_product(pairs)
-        """dct.fit(k)
-        y_dct[i] = dct.distortions_inner_product(pairs)"""
+        """dct.fit(k, pairs)
+        y_dct[i] = dct.distortions_inner_product()"""
         rp = RP(X, k)
         rp.fit()
         y_rp[i] = rp.distortions_inner_product(pairs)
@@ -106,7 +106,7 @@ def test_text():
     plt.legend(["RP", "PCA"])
     plt.title("Average error using RP and SVD")
     plt.xlabel("Reduced dim. of data")
-    plt.ylabel("Error difference")
+
     plt.show()
 
 def test_image(type="img"):
@@ -147,8 +147,8 @@ def test_image(type="img"):
         y_srp[i] = srp.distortions_euclidean(pairs)
         pca.fit(k)
         y_pca[i] = pca.distortions_euclidean(pairs)
-        dct.fit(k)
-        y_dct[i] = dct.distortions_euclidean(pairs)
+        dct.fit(k, pairs)
+        y_dct[i] = dct.distortions_euclidean()
         rp = RP(X, k)
         rp.fit()
         y_rp[i] = rp.distortions_euclidean(pairs)
@@ -171,12 +171,11 @@ def test_image(type="img"):
     if type == "noisy_img":
         plt.fill_between(x, (np.mean(y_mf) - ci_mf), (np.mean(y_mf) + ci_mf), color='black', alpha=0.1)
         plt.legend(["MF", "RP", "PCA", "SRP", "DCT"])
-        plt.title("Average error using MF, PCA, RP, SVD and DCT")
+        plt.title("Average error using MF, PCA, RP, SRP and DCT")
     else:
         plt.legend(["RP", "PCA", "SRP", "DCT"])
-        plt.title("Average error using PCA, RP, SVD and DCT")
+        plt.title("Average error using PCA, RP, SRP and DCT")
     plt.xlabel("Reduced dim. of data")
-    plt.ylabel("Error difference")
     plt.show()
 
 def test_audio():
@@ -216,8 +215,8 @@ def test_audio():
         rp.fit()
         y_rp[i] = rp.distortions_euclidean(pairs)
     #for i, k in enumerate(tqdm(range(start, stop, step))):
-        dct.fit(k)
-        y_dct[i] = dct.distortions_euclidean(pairs)
+        dct.fit(k, pairs)
+        y_dct[i] = dct.distortions_euclidean()
 
     #x_dct = np.arange(start, stop, step)
     x = np.arange(start2, stop2, step2)
@@ -249,13 +248,12 @@ def test_audio():
     plt.fill_between(x, (np.mean(y_dct, axis=1) - ci_dct), (np.mean(y_dct, axis=1) + ci_dct), color='green', alpha=0.1)
 
     plt.legend(["RP", "PCA", "SRP", "DCT"])
-    plt.title("Average error using PCA, RP, SVD and DCT")
+    plt.title("Average error using PCA, RP, SRP and DCT")
     plt.xlabel("Reduced dim. of data")
-    plt.ylabel("Error difference")
     plt.show()
 
 
-def text2():
+def test_text2():
     docs = glob.glob('data/text2/**/*')
     corpus = []
     for doc in docs:
@@ -283,8 +281,8 @@ def text2():
         y_srp[i] = srp.distortions_inner_product(pairs)"""
         pca.fit(k)
         y_pca[i] = pca.distortions_inner_product(pairs)
-        """dct.fit(k)
-        y_dct[i] = dct.distortions_inner_product(pairs)"""
+        """dct.fit(k, pairs)
+        y_dct[i] = dct.distortions_inner_product()"""
         rp = RP(X, k)
         rp.fit()
         y_rp[i] = rp.distortions_inner_product(pairs)
@@ -305,13 +303,12 @@ def text2():
     plt.legend(["RP", "PCA"])
     plt.title("Average error using RP and SVD")
     plt.xlabel("Reduced dim. of data")
-    plt.ylabel("Error difference")
     plt.show()
 
 
 if __name__ == "__main__":
-    #text2()
-    test_image("img")
+    test_text()
+    #test_image("img")
     #test_audio()
     #test_image("noisy_img")
-    #test_text()
+    test_text2()

@@ -6,6 +6,7 @@ class PCA(DimRed):
 
     def __init__(self, X, components):
         self.N = X.shape[1]
+
         self.X = X
         self.scale = 1
         self.X_mean = self.X - np.mean(self.X, axis=0)

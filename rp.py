@@ -1,6 +1,5 @@
 import numpy as np
 from DimRed import DimRed
-from sklearn.random_projection import GaussianRandomProjection as GRP
 
 class RP(DimRed):
     def __init__(self, X, k):
@@ -13,7 +12,7 @@ class RP(DimRed):
         self.d = X.shape[0]
         self.scale = np.sqrt(self.d / self.k)
         self.X = X
-        self.R = np.random.normal(loc=0.0, scale=1, size=((self.d, self.k)))
+        self.R = np.random.normal(loc=0.0, scale=1.0, size=((self.d, self.k)))
         self.R = (self.R / np.sqrt((self.R**2).sum(axis=0))).T
 
     def fit(self):
@@ -24,6 +23,16 @@ class RP(DimRed):
         self.X_k = self.R @ self.X
         return self.X_k
 
-
+    def distortions_inner_product(self, m):
+        """
+        for text data
+        :param m: number of pair comparisons
+        :return: distortions measured by inner product
+        """
+        ids1 = np.random.choice(range(self.N), size=m)
+        ids2 = np.random.choice(list(set(range(self.N))-set(ids1)), size=m)
+        emd_prod = self.scale**2 * np.sum(np.multiply(self.X_k.T[ids1], self.X_k.T[ids2]), axis=1)
+        prod = np.sum(np.multiply(self.X.T[ids1], self.X.T[ids2]), axis=1)
+        return emd_prod - prod
 
 
